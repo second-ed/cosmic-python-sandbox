@@ -1,0 +1,31 @@
+[project]
+name = "cosmic-python-sandbox"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "ed cuss", email = "edcussmusic@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "attrs>=25.3.0",
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "pyspark>=3.5.5",
+]
+
+[project.scripts]
+cosmic-python-sandbox = "cosmic_python_sandbox:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "ruff>=0.11.7",
+]
