@@ -74,7 +74,7 @@ def format_code_str(code_snippet: str) -> str:
 def create_input_func(input_cmd: str, ext: str, tab: str) -> tuple[str]:
     lines = (
         f"{tab}def {input_cmd}_{ext}(self, path: str, **kwargs) -> Data:",
-        f"{tab * 2}return self._read_db(path, '{ext}')",
+        f"{tab * 2}return self._read_db(path, '{ext}', **kwargs)",
     )
     return lines
 
@@ -82,7 +82,7 @@ def create_input_func(input_cmd: str, ext: str, tab: str) -> tuple[str]:
 def create_output_func(output_cmd: str, ext: str, tab: str) -> tuple[str]:
     lines = (
         f"{tab}def {output_cmd}_{ext}(self, data, path: str, **kwargs) -> bool:",
-        f"{tab * 2}return self._write_db(data, path)",
+        f"{tab * 2}return self._write_db(data, path, **kwargs)",
     )
     return lines
 
@@ -90,7 +90,7 @@ def create_output_func(output_cmd: str, ext: str, tab: str) -> tuple[str]:
 def create_ext_input_func(input_cmd: str, tab: str) -> tuple[str]:
     lines = (
         f"{tab}def {input_cmd}(self, path: str, **kwargs) -> Data:",
-        f"{tab * 2}return self._read_external_src(path)",
+        f"{tab * 2}return self._read_external_src(path, **kwargs)",
     )
     return lines
 
@@ -101,7 +101,7 @@ def get_db_funcs(tab: str) -> tuple[str]:
     check_file = (
         f"{tab}def _check_db(self, path: str) -> None:",
         f"{tab * 2}if path not in self.db:",
-        f'{tab * 3}raise FileNotFoundError(f"{{path = }} not in db {{list(self.db.keys())}}")\n',
+        f'{tab * 3}raise FileNotFoundError(f"{{path = }} not in {{list(self.db.keys()) = }}")\n',
         f"{tab * 2}if not self.strict:",
         f"{tab * 3}return\n",
         f"{tab * 2}path_ext = os.path.splitext(path)[-1]",
@@ -113,7 +113,7 @@ def get_db_funcs(tab: str) -> tuple[str]:
     read_func = (
         f"{tab}def _read_db(self, path: str, ext: str, **kwargs) -> Data:",
         f"{tab * 2}self.log.append(('read', path, kwargs))",
-        f"{tab * 2}self._check_db(path, ext)",
+        f"{tab * 2}self._check_db(path)",
         f"{tab * 2}return self.db[path]",
     )
 
@@ -128,11 +128,6 @@ def get_db_funcs(tab: str) -> tuple[str]:
 
 
 def get_standard_ops(tab):
-    size_func = (
-        f"{tab}def get_size(self, path: str) -> int:",
-        f"{tab * 2}self.log.append(('size', path))",
-        f"{tab * 2}return len(path.encode('utf-8'))",
-    )
     copy_func = (
         f"{tab}def copy(self, path: str, new_path: str) -> bool:",
         f"{tab * 2}self.log.append(('copy', path, new_path))",
@@ -164,7 +159,12 @@ def get_standard_ops(tab):
         f"{tab * 2}self.log.append(('list_files', path))",
         f"{tab * 2}return [p for p in self.db if p.startswith(prefix)]",
     )
-    return size_func, copy_func, move_func, remove_func, exists_func, list_files_func
+    size_func = (
+        f"{tab}def get_size(self, path: str) -> int:",
+        f"{tab * 2}self.log.append(('size', path))",
+        f"{tab * 2}return len(path.encode('utf-8'))",
+    )
+    return copy_func, move_func, remove_func, exists_func, list_files_func, size_func
 
 
 def write_str(data: str, path: str) -> Literal[True]:
