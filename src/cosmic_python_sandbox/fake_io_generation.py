@@ -41,7 +41,7 @@ def generate_fake_io(
         funcs.append(
             (
                 f"{tab}def get_{hash_type}(self, path: str) -> str:",
-                f"{tab * 2}self.log.append(('hash', path))",
+                f"{tab * 2}self.log.append(('get_{hash_type}', path))",
                 f"{tab * 2}return hashlib.md5(path.encode()).hexdigest()",
             )
         )
@@ -161,7 +161,7 @@ def get_standard_ops(tab):
     )
     size_func = (
         f"{tab}def get_size(self, path: str) -> int:",
-        f"{tab * 2}self.log.append(('size', path))",
+        f"{tab * 2}self.log.append(('get_size', path))",
         f"{tab * 2}return len(path.encode('utf-8'))",
     )
     return copy_func, move_func, remove_func, exists_func, list_files_func, size_func
