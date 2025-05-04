@@ -3,7 +3,11 @@ from typing import Callable, Sequence
 
 import attrs
 
-from cosmic_python_sandbox.event import Event
+
+@attrs.define
+class Event:
+    priority_event: bool = attrs.field(default=False)
+
 
 EventHandlers = dict[type, Callable[[Event], Event | Sequence[Event] | None]]
 
