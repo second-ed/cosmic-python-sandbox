@@ -81,7 +81,7 @@ def create_input_func(input_cmd: str, ext: str, tab: str) -> tuple[str]:
 
 def create_output_func(output_cmd: str, ext: str, tab: str) -> tuple[str]:
     lines = (
-        f"{tab}def {output_cmd}_{ext}(self, data, path: str, **kwargs) -> bool:",
+        f"{tab}def {output_cmd}_{ext}(self, data: Data, path: str, **kwargs) -> bool:",
         f"{tab * 2}return self._write_db(data, path, **kwargs)",
     )
     return lines
@@ -118,7 +118,7 @@ def get_db_funcs(tab: str) -> tuple[str]:
     )
 
     write_func = (
-        f"{tab}def _write_db(self, data, path: str, **kwargs) -> bool:",
+        f"{tab}def _write_db(self, data: Data, path: str, **kwargs) -> bool:",
         f"{tab * 2}self.log.append(('write', path, kwargs))",
         f"{tab * 2}self.db[path] = data",
         f"{tab * 2}return True",
