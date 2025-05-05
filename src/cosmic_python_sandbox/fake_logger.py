@@ -1,8 +1,7 @@
 import attrs
 
-attrs.define
 
-
+@attrs.define
 class FakeLogger:
     log: list = attrs.field(default=attrs.Factory(list))
 
