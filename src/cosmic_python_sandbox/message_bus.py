@@ -16,6 +16,7 @@ EventHandlers = dict[type, Callable[[Event], Event | Sequence[Event] | None]]
 class MessageBus:
     event_handlers: EventHandlers = attrs.field()
     queue: deque = attrs.field(default=attrs.Factory(deque))
+    log: list = attrs.field(default=attrs.Factory(list))
 
     def add_events(self, events: Sequence[Event]):
         if not isinstance(events, Sequence) or not all(
@@ -26,6 +27,7 @@ class MessageBus:
 
     def handle_event(self):
         event = self.queue.popleft()
+        self.log.append(event)
         result = self.event_handlers[type(event)](event)
 
         if isinstance(result, Event):
