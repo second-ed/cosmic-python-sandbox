@@ -103,7 +103,7 @@ def get_db_funcs(tab: str) -> tuple[str]:
     reset = (f"{tab}def reset_db(self):", f"{tab * 2}self.db = {{}}")
 
     check_file = (
-        f"{tab}def _check_db(self, path: str) -> None:",
+        f"{tab}def _check_db(self, path: str, ext: str) -> None:",
         f"{tab * 2}if path not in self.db:",
         f'{tab * 3}raise FileNotFoundError(f"{{path = }} not in {{list(self.db.keys()) = }}")\n',
         f"{tab * 2}if not self.strict:",
@@ -117,7 +117,7 @@ def get_db_funcs(tab: str) -> tuple[str]:
     read_func = (
         f"{tab}def _read_db(self, path: str, ext: str, **kwargs) -> Data:",
         f"{tab * 2}self.log.append(('read', path, kwargs))",
-        f"{tab * 2}self._check_db(path)",
+        f"{tab * 2}self._check_db(path, ext)",
         f"{tab * 2}return self.db[path]",
     )
 
@@ -160,7 +160,7 @@ def get_standard_ops(tab):
     )
     list_files_func = (
         f"{tab}def list_files(self, prefix: str = '') -> list[str]:",
-        f"{tab * 2}self.log.append(('list_files', path))",
+        f"{tab * 2}self.log.append(('list_files', prefix))",
         f"{tab * 2}return [p for p in self.db if p.startswith(prefix)]",
     )
     size_func = (
@@ -169,6 +169,12 @@ def get_standard_ops(tab):
         f"{tab * 2}return len(path.encode('utf-8'))",
     )
     return copy_func, move_func, remove_func, exists_func, list_files_func, size_func
+
+
+def read_str(path: str) -> str:
+    with open(path, "r") as f:
+        data = f.read()
+    return data
 
 
 def write_str(data: str, path: str) -> Literal[True]:
