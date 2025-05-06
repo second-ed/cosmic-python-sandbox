@@ -2,6 +2,9 @@ from collections import deque
 from typing import Callable, Sequence
 
 import attrs
+from attrs.validators import instance_of
+
+from cosmic_python_sandbox.fake_logger import LoggerProtocol
 
 
 @attrs.define
@@ -15,8 +18,8 @@ EventHandlers = dict[type, Callable[[Event], Event | Sequence[Event] | None]]
 @attrs.define
 class MessageBus:
     event_handlers: EventHandlers = attrs.field()
+    logger: LoggerProtocol = attrs.field(validator=instance_of(LoggerProtocol))
     queue: deque = attrs.field(default=attrs.Factory(deque))
-    log: list = attrs.field(default=attrs.Factory(list))
 
     def add_events(self, events: Sequence[Event]):
         if not isinstance(events, Sequence) or not all(
@@ -27,7 +30,7 @@ class MessageBus:
 
     def handle_event(self):
         event = self.queue.popleft()
-        self.log.append(event)
+        self.logger.info(event)
         result = self.event_handlers[type(event)](event)
 
         if isinstance(result, Event):

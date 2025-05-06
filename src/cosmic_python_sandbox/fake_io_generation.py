@@ -16,6 +16,10 @@ def generate_fake_io(
     hash_types = hash_types or []
 
     init = (
+        (
+            "'''Example FakeIO class that covers most operations.\n"
+            "Fakes an editable db and external source that is read-only.'''"
+        ),
         "from copy import deepcopy",
         "from typing import TypeVar",
         "import hashlib",

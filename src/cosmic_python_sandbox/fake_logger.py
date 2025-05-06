@@ -1,8 +1,19 @@
+from typing import Protocol, runtime_checkable
+
 import attrs
 
 
+@runtime_checkable
+class LoggerProtocol(Protocol):
+    def debug(self, msg: str) -> None: ...
+
+    def info(self, msg: str) -> None: ...
+
+    def error(self, msg: str) -> None: ...
+
+
 @attrs.define
-class FakeLogger:
+class FakeLogger(LoggerProtocol):
     log: list = attrs.field(default=attrs.Factory(list))
 
     def notset(self, msg: str) -> None:
