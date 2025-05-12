@@ -4,7 +4,12 @@ import attrs
 import pytest
 
 from src.cosmic_python_sandbox.fake_logger import FakeLogger
-from src.cosmic_python_sandbox.message_bus import Event, MessageBus
+from src.cosmic_python_sandbox.message_bus import (
+    Event,
+    LoggerProtocol,
+    MessageBus,
+)
+from src.cosmic_python_sandbox.uow import UnitOfWork, UnitOfWorkProtocol
 
 
 @attrs.define
@@ -27,28 +32,34 @@ class SomeEvent4(Event):
     pass
 
 
-def handle_event1(event):
+def handle_event1(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
     return SomeEvent2()
 
 
-def handle_event2(event):
+def handle_event2(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
     return SomeEvent3()
 
 
-def handle_event3(event):
+def handle_event3(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
     return SomeEvent4()
 
 
-def handle_event4(event):
+def handle_event4(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
+    with uow:
+        pass
     pass
 
 
-def handle_event2_priority(event):
+def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
     return [SomeEvent3(), SomeEvent4(True)]
 
 
-def handle_event3_priority(event):
+def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
     return SomeEvent4(True)
+
+
+def fixed_guid():
+    return "123-abc"
 
 
 @pytest.mark.parametrize(
@@ -102,7 +113,8 @@ def handle_event3_priority(event):
 def test_message_bus(handlers, starting_events, expected_log, expected_context):
     with expected_context:
         logger = FakeLogger()
-        bus = MessageBus(event_handlers=handlers, logger=logger)
+        uow = UnitOfWork(repo=[], logger=logger, guid_generator=fixed_guid)
+        bus = MessageBus(uow=uow, event_handlers=handlers, logger=logger)
         bus.add_events(starting_events)
         bus.handle_events()
         bus.logger.log == expected_log
