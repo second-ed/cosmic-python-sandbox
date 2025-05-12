@@ -94,8 +94,12 @@ def fixed_guid():
             [
                 "INFO: SomeEvent2(priority_event=False)",
                 "INFO: SomeEvent4(priority_event=True)",
+                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
                 "INFO: SomeEvent3(priority_event=False)",
                 "INFO: SomeEvent4(priority_event=True)",
+                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
             ],
             does_not_raise(),
             id="Ensure simple priority queue is executed correctly",
