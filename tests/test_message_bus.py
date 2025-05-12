@@ -6,7 +6,6 @@ import pytest
 from src.cosmic_python_sandbox.fake_logger import FakeLogger
 from src.cosmic_python_sandbox.message_bus import (
     Event,
-    LoggerProtocol,
     MessageBus,
 )
 from src.cosmic_python_sandbox.uow import UnitOfWork, UnitOfWorkProtocol
@@ -32,29 +31,29 @@ class SomeEvent4(Event):
     pass
 
 
-def handle_event1(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
+def handle_event1(event: Event, uow: UnitOfWorkProtocol):
     return SomeEvent2()
 
 
-def handle_event2(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
+def handle_event2(event: Event, uow: UnitOfWorkProtocol):
     return SomeEvent3()
 
 
-def handle_event3(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
+def handle_event3(event: Event, uow: UnitOfWorkProtocol):
     return SomeEvent4()
 
 
-def handle_event4(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
+def handle_event4(event: Event, uow: UnitOfWorkProtocol):
     with uow:
         pass
     pass
 
 
-def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
+def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol):
     return [SomeEvent3(), SomeEvent4(True)]
 
 
-def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol, logger: LoggerProtocol):
+def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
     return SomeEvent4(True)
 
 
@@ -78,6 +77,8 @@ def fixed_guid():
                 "INFO: SomeEvent2(priority_event=False)",
                 "INFO: SomeEvent3(priority_event=False)",
                 "INFO: SomeEvent4(priority_event=False)",
+                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
             ],
             does_not_raise(),
             id="Ensure simple linear queue is executed correctly",
@@ -114,7 +115,7 @@ def test_message_bus(handlers, starting_events, expected_log, expected_context):
     with expected_context:
         logger = FakeLogger()
         uow = UnitOfWork(repo=[], logger=logger, guid_generator=fixed_guid)
-        bus = MessageBus(uow=uow, event_handlers=handlers, logger=logger)
+        bus = MessageBus(uow=uow, event_handlers=handlers)
         bus.add_events(starting_events)
         bus.handle_events()
-        bus.logger.log == expected_log
+        bus.uow.logger.log == expected_log

@@ -4,7 +4,6 @@ from typing import Callable, Sequence
 import attrs
 from attrs.validators import instance_of
 
-from cosmic_python_sandbox.fake_logger import LoggerProtocol
 from cosmic_python_sandbox.uow import UnitOfWorkProtocol
 
 
@@ -20,7 +19,6 @@ EventHandlers = dict[type, Callable[[Event], Event | Sequence[Event] | None]]
 class MessageBus:
     event_handlers: EventHandlers = attrs.field()
     uow: UnitOfWorkProtocol = attrs.field(validator=instance_of(UnitOfWorkProtocol))
-    logger: LoggerProtocol = attrs.field(validator=instance_of(LoggerProtocol))
     queue: deque = attrs.field(default=attrs.Factory(deque))
 
     def add_events(self, events: Sequence[Event]):
@@ -30,8 +28,8 @@ class MessageBus:
 
     def handle_event(self):
         event = self.queue.popleft()
-        self.logger.info(event)
-        result = self.event_handlers[type(event)](event, self.uow, self.logger)
+        self.uow.logger.info(event)
+        result = self.event_handlers[type(event)](event, self.uow)
 
         if isinstance(result, Event):
             if result.priority_event:
