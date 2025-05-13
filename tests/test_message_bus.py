@@ -3,6 +3,7 @@ from contextlib import nullcontext as does_not_raise
 import attrs
 import pytest
 
+from src.cosmic_python_sandbox.fake_io import FakeIO
 from src.cosmic_python_sandbox.fake_logger import FakeLogger
 from src.cosmic_python_sandbox.message_bus import (
     Event,
@@ -117,8 +118,9 @@ def fixed_guid():
 )
 def test_message_bus(handlers, starting_events, expected_log, expected_context):
     with expected_context:
+        fake_io = FakeIO()
         logger = FakeLogger()
-        uow = UnitOfWork(repo=[], logger=logger, guid_generator=fixed_guid)
+        uow = UnitOfWork(repo=fake_io, logger=logger, guid_generator=fixed_guid)
         bus = MessageBus(uow=uow, event_handlers=handlers)
         bus.add_events(starting_events)
         bus.handle_events()

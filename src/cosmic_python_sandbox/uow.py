@@ -1,25 +1,17 @@
 import uuid
 from enum import Enum, auto
-from typing import Callable, Protocol, TypeVar, runtime_checkable
+from typing import Callable, Protocol, runtime_checkable
 
 import attrs
 
+from cosmic_python_sandbox.fake_io import IOWrapperProtocol
 from cosmic_python_sandbox.fake_logger import LoggerProtocol
-
-Data = TypeVar("Data")
 
 
 class FileType(Enum):
     PARQUET = auto()
     CSV = auto()
     JSON = auto()
-
-
-@runtime_checkable
-class IOWrapperProtocol(Protocol):
-    def read(self, path: str, file_type: FileType) -> Data: ...
-
-    def write(self, path: str, data: Data) -> bool: ...
 
 
 @runtime_checkable
@@ -39,8 +31,9 @@ class UnitOfWork:
     def __enter__(self):
         self.guid = str(self.guid_generator())
         self.logger.info({"guid": self.guid, "msg": "Initialising UOW"})
-        # any initialisation
-        # self.repo.etc()
+
+        # generic setup ops
+        self.repo.setup()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -48,5 +41,6 @@ class UnitOfWork:
             self.logger.error({"guid": self.guid, "msg": exc_val})
         else:
             self.logger.info({"guid": self.guid, "msg": "Completed UOW"})
-        # close connection to repo
-        # self.repo.etc()
+
+        # clean up afterwards
+        self.repo.teardown()
