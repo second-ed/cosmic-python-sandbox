@@ -1,17 +1,10 @@
 import uuid
-from enum import Enum, auto
 from typing import Callable, Protocol, runtime_checkable
 
 import attrs
 
 from cosmic_python_sandbox.fake_io import IOWrapperProtocol
 from cosmic_python_sandbox.fake_logger import LoggerProtocol
-
-
-class FileType(Enum):
-    PARQUET = auto()
-    CSV = auto()
-    JSON = auto()
 
 
 @runtime_checkable
