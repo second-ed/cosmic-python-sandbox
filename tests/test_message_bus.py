@@ -46,8 +46,8 @@ def handle_event3(event: Event, uow: UnitOfWorkProtocol):
 
 def handle_event4(event: Event, uow: UnitOfWorkProtocol):
     with uow:
-        pass
-    pass
+        uow.repo.write("abc.ext", [1, 2, 3])
+        assert uow.repo.read("abc.ext", "ext") == [1, 2, 3]
 
 
 def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol):
