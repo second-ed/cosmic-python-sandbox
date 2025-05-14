@@ -3,8 +3,8 @@ from typing import Callable, Protocol, runtime_checkable
 
 import attrs
 
-from cosmic_python_sandbox.fake_io import IOWrapperProtocol
-from cosmic_python_sandbox.fake_logger import LoggerProtocol
+from cosmic_python_sandbox.io_mod import IOWrapperProtocol
+from cosmic_python_sandbox.logger import LoggerProtocol
 
 
 @runtime_checkable

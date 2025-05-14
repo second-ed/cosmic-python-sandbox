@@ -3,8 +3,8 @@ from contextlib import nullcontext as does_not_raise
 import attrs
 import pytest
 
-from src.cosmic_python_sandbox.fake_io import FakeIO
-from src.cosmic_python_sandbox.fake_logger import FakeLogger
+from src.cosmic_python_sandbox.io_mod import FakeIO
+from src.cosmic_python_sandbox.logger import FakeLogger
 from src.cosmic_python_sandbox.message_bus import (
     Event,
     MessageBus,

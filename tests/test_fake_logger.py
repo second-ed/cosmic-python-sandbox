@@ -1,4 +1,4 @@
-from cosmic_python_sandbox.fake_logger import FakeLogger
+from cosmic_python_sandbox.logger import FakeLogger
 
 
 def test_fake_logger():
