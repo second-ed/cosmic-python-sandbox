@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from src.cosmic_python_sandbox.detect_io_infection import find_io_infected_funcs
+from src.cosmic_python_sandbox.utils.detect_io_infection import find_io_infected_funcs
 
-REPO_ROOT = Path(__file__).parents[1]
+REPO_ROOT = Path(__file__).parents[2]
 
 
 @pytest.mark.parametrize(

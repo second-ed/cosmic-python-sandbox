@@ -15,7 +15,7 @@ class UnitOfWorkProtocol(Protocol):
 
 
 @attrs.define
-class UnitOfWork:
+class UnitOfWork(UnitOfWorkProtocol):
     repo: IOWrapperProtocol = attrs.field()
     logger: LoggerProtocol = attrs.field()
     guid_generator: Callable = attrs.field(default=uuid.uuid4)
