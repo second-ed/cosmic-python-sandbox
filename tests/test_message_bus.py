@@ -3,6 +3,7 @@ from contextlib import nullcontext as does_not_raise
 import attrs
 import pytest
 
+from src.cosmic_python_sandbox.handlers import EVENT_HANDLERS
 from src.cosmic_python_sandbox.io_mod import FakeIO
 from src.cosmic_python_sandbox.logger import FakeLogger
 from src.cosmic_python_sandbox.message_bus import (
@@ -100,6 +101,17 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
             ],
             does_not_raise(),
             id="Ensure simple priority queue is executed correctly",
+        ),
+        pytest.param(
+            EVENT_HANDLERS,
+            [Event()],
+            [
+                "INFO: Event(priority_event=False)",
+                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
+            ],
+            does_not_raise(),
+            id="Ensure single queue is executed correctly",
         ),
         pytest.param(
             {

@@ -1,18 +1,12 @@
 from collections import deque
-from typing import Callable, Sequence
+from typing import Sequence
 
 import attrs
 from attrs.validators import instance_of
 
+from cosmic_python_sandbox.events import Event
+from cosmic_python_sandbox.handlers import EventHandlers
 from cosmic_python_sandbox.uow import UnitOfWorkProtocol
-
-
-@attrs.define
-class Event:
-    priority_event: bool = attrs.field(default=False)
-
-
-EventHandlers = dict[type, Callable[[Event], Event | Sequence[Event] | None]]
 
 
 @attrs.define
