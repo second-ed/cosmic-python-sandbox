@@ -58,10 +58,6 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
     return SomeEvent4(True)
 
 
-def fixed_guid():
-    return "123-abc"
-
-
 @pytest.mark.parametrize(
     "handlers, starting_events, expected_log, expected_context",
     (
@@ -117,6 +113,9 @@ def fixed_guid():
     ),
 )
 def test_message_bus(handlers, starting_events, expected_log, expected_context):
+    def fixed_guid():
+        return "123-abc"
+
     with expected_context:
         fake_io = FakeIO()
         logger = FakeLogger()
