@@ -34,10 +34,13 @@ def parse_event(msg: dict) -> Event:
     match msg:
         case {"action": "copy", "src": _, "dst": _}:
             return CopyFile.from_dict(msg)
+
         case {"action": "move", "src": _, "dst": _}:
             return MoveFile.from_dict(msg)
+
         case {"action": "delete", "dst": _}:
             return DeleteFile.from_dict(msg)
+
         case {"priority_event": _}:
             return Event.from_dict(msg)
 
