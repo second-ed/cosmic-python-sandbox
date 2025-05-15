@@ -1,10 +1,8 @@
 from contextlib import nullcontext as does_not_raise
 
-import attrs
 import pytest
 
 from src.cosmic_python_sandbox import events
-from src.cosmic_python_sandbox.parsers import parse_event
 
 
 @pytest.mark.parametrize(
@@ -35,4 +33,4 @@ from src.cosmic_python_sandbox.parsers import parse_event
 )
 def test_parse_event(msg, expected_result, expected_context):
     with expected_context:
-        assert attrs.asdict(parse_event(msg)) == attrs.asdict(expected_result)
+        assert events.parse_event(msg) == expected_result
