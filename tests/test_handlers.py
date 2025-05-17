@@ -17,12 +17,9 @@ def db():
         "some_filepath2.sh": "echo blah",
     }
 
-    #     MoveFile(src="some_filepath2.sh", dst="better_bash_name.sh"),
-    # DeleteFile(dst="some_filepath1.py")
-
 
 @pytest.mark.parametrize(
-    "starting_events, expected_db, expected_log",
+    "starting_events, expected_db",
     (
         pytest.param(
             [
@@ -33,7 +30,6 @@ def db():
                 "another_filepath2.py": "import this",
                 "some_filepath2.sh": "echo blah",
             },
-            [],
         ),
         pytest.param(
             [
@@ -43,7 +39,6 @@ def db():
                 "another_filepath2.py": "import this",
                 "some_filepath2.sh": "echo blah",
             },
-            [],
         ),
         pytest.param(
             [
@@ -52,7 +47,6 @@ def db():
             {
                 "some_filepath1.py": "import this",
             },
-            [],
         ),
         pytest.param(
             [
@@ -64,11 +58,10 @@ def db():
                 "some_filepath1.py": "import this",
                 "better_name.sh": "echo blah",
             },
-            [],
         ),
     ),
 )
-def test_handler(db, starting_events, expected_db, expected_log):
+def test_handler(db, starting_events, expected_db):
     fake_io = FakeIO(db)
     logger = FakeLogger()
     uow = UnitOfWork(repo=fake_io, logger=logger)
@@ -76,4 +69,6 @@ def test_handler(db, starting_events, expected_db, expected_log):
     bus.add_events(starting_events)
     bus.handle_events()
     assert fake_io.db == expected_db
-    # assert bus.uow.logger.log == expected_log
+
+    # make sure guids in all logs
+    assert all("{'guid': " in log for log in bus.uow.logger.log)
