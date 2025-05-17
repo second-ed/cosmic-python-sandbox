@@ -3,14 +3,14 @@ from contextlib import nullcontext as does_not_raise
 import attrs
 import pytest
 
-from src.cosmic_python_sandbox.handlers import EVENT_HANDLERS
-from src.cosmic_python_sandbox.io_mod import FakeIO
-from src.cosmic_python_sandbox.logger import FakeLogger
-from src.cosmic_python_sandbox.message_bus import (
+from cosmic_python_sandbox.handlers import EVENT_HANDLERS
+from cosmic_python_sandbox.io_mod import FakeIO
+from cosmic_python_sandbox.logger import FakeLogger
+from cosmic_python_sandbox.message_bus import (
     Event,
     MessageBus,
 )
-from src.cosmic_python_sandbox.uow import UnitOfWork, UnitOfWorkProtocol
+from cosmic_python_sandbox.uow import UnitOfWork, UnitOfWorkProtocol
 
 
 @attrs.define

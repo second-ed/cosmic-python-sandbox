@@ -1,3 +1,4 @@
+from copy import deepcopy
 from enum import Enum, auto
 from typing import Protocol, TypeVar, runtime_checkable
 
@@ -38,4 +39,19 @@ class FakeIO(IOWrapperProtocol):
         return True
 
     def teardown(self) -> bool:
+        return True
+
+    def copy(self, path: str, new_path: str) -> bool:
+        data = deepcopy(self.db[path])
+        self.db[new_path] = data
+        return True
+
+    def move(self, path: str, new_path: str) -> bool:
+        data = deepcopy(self.db[path])
+        self.db[new_path] = data
+        self.db.pop(path)
+        return True
+
+    def delete(self, path: str) -> bool:
+        self.db.pop(path)
         return True

@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Sequence
+from collections.abc import Sequence
 
 import attrs
 from attrs.validators import instance_of
@@ -22,7 +22,6 @@ class MessageBus:
 
     def handle_event(self):
         event = self.queue.popleft()
-        self.uow.logger.info(event)
         result = self.event_handlers[type(event)](event, self.uow)
 
         if isinstance(result, Event):

@@ -2,7 +2,7 @@ from contextlib import nullcontext as does_not_raise
 
 import pytest
 
-from src.cosmic_python_sandbox import events
+from cosmic_python_sandbox import events
 
 
 @pytest.mark.parametrize(

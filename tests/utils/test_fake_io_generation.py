@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from src.cosmic_python_sandbox.utils.fake_io_generation import generate_fake_io, read_str
+from cosmic_python_sandbox.utils.fake_io_generation import generate_fake_io, read_str
 
 REPO_ROOT = Path(__file__).parents[2]
 
