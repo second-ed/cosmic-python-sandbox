@@ -9,6 +9,7 @@ EventHandlers = dict[type, Callable[[Event], Event | Sequence[Event] | None]]
 def example_handler(event: Event, uow: UnitOfWorkProtocol):
     with uow:
         print(event)
+        raise ValueError(f"Must use a specialised event. Given {event}")
 
 
 def copy_file(event: CopyFile, uow: UnitOfWorkProtocol):

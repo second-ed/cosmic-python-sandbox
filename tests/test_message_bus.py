@@ -34,14 +34,20 @@ class SomeEvent4(Event):
 
 
 def handle_event1(event: Event, uow: UnitOfWorkProtocol):
+    with uow:
+        uow.logger.info({"guid": uow.guid, "event": event})
     return SomeEvent2()
 
 
 def handle_event2(event: Event, uow: UnitOfWorkProtocol):
+    with uow:
+        uow.logger.info({"guid": uow.guid, "event": event})
     return SomeEvent3()
 
 
 def handle_event3(event: Event, uow: UnitOfWorkProtocol):
+    with uow:
+        uow.logger.info({"guid": uow.guid, "event": event})
     return SomeEvent4()
 
 
@@ -52,10 +58,14 @@ def handle_event4(event: Event, uow: UnitOfWorkProtocol):
 
 
 def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol):
+    with uow:
+        uow.logger.info({"guid": uow.guid, "event": event})
     return [SomeEvent3(), SomeEvent4(True)]
 
 
 def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
+    with uow:
+        uow.logger.info({"guid": uow.guid, "event": event})
     return SomeEvent4(True)
 
 
@@ -71,10 +81,15 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
             },
             [SomeEvent1()],
             [
-                "INFO: SomeEvent1(priority_event=False)",
-                "INFO: SomeEvent2(priority_event=False)",
-                "INFO: SomeEvent3(priority_event=False)",
-                "INFO: SomeEvent4(priority_event=False)",
+                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'event': SomeEvent1(priority_event=False)}",
+                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'event': SomeEvent2(priority_event=False)}",
+                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'event': SomeEvent3(priority_event=False)}",
+                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
                 "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
                 "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
             ],
@@ -90,12 +105,14 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
             },
             [SomeEvent2()],
             [
-                "INFO: SomeEvent2(priority_event=False)",
-                "INFO: SomeEvent4(priority_event=True)",
+                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'event': SomeEvent2(priority_event=False)}",
+                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
                 "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
                 "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
-                "INFO: SomeEvent3(priority_event=False)",
-                "INFO: SomeEvent4(priority_event=True)",
+                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'event': SomeEvent3(priority_event=False)}",
+                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
                 "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
                 "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
             ],
@@ -106,11 +123,10 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
             EVENT_HANDLERS,
             [Event()],
             [
-                "INFO: Event(priority_event=False)",
                 "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
+                "ERROR: {'guid': '123-abc', 'msg': ValueError('Must use a specialised event. Given Event(priority_event=False)')}",
             ],
-            does_not_raise(),
+            pytest.raises(ValueError),
             id="Ensure single queue is executed correctly",
         ),
         pytest.param(
@@ -118,7 +134,7 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
                 SomeEvent1: handle_event1,
             },
             [1],
-            None,
+            [],
             pytest.raises(ValueError),
             id="Ensure raises ValueError when given invalid events",
         ),
@@ -135,4 +151,5 @@ def test_message_bus(handlers, starting_events, expected_log, expected_context):
         bus = MessageBus(uow=uow, event_handlers=handlers)
         bus.add_events(starting_events)
         bus.handle_events()
-        bus.uow.logger.log == expected_log
+
+    assert bus.uow.logger.log == expected_log
