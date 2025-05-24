@@ -1,4 +1,5 @@
 import inspect
+from collections.abc import Callable
 
 import pytest
 
@@ -12,7 +13,7 @@ class FakeSanityCheck:
     def method_a(self, a: int, b: float) -> float:
         return a * b
 
-    def some_test_helper_method(self, c: bool) -> bool:
+    def some_test_helper_method(self, *, c: bool) -> bool:
         return c
 
 
@@ -21,39 +22,42 @@ class FakeMissingMethod:
 
 
 class FakeMismatchingSignature:
-    def method_a(self, a: int):
+    def method_a(self, a: int) -> int:
         return a
 
 
 @pytest.mark.parametrize(
-    "real, fake",
-    (
-        pytest.param(SanityCheck(), FakeSanityCheck(), id="ensure matching public methods pass"),
+    ("real", "fake"),
+    [
+        pytest.param(
+            SanityCheck(), FakeSanityCheck(), id="ensure matching public methods pass"
+        ),
         pytest.param(
             SanityCheck(),
             FakeMissingMethod(),
             id="ensure fails if fake missing method",
-            marks=pytest.mark.xfail(reason="ensure fails if fake missing method", strict=True),
+            marks=pytest.mark.xfail(
+                reason="ensure fails if fake missing method", strict=True
+            ),
         ),
         pytest.param(
             SanityCheck(),
             FakeMismatchingSignature(),
             id="ensure fails if fake not matching signature",
             marks=pytest.mark.xfail(
-                reason="ensure fails if fake not matching signature", strict=True
+                reason="ensure fails if fake not matching signature",
+                strict=True,
             ),
         ),
-    ),
+    ],
 )
-def test_api_match(real, fake):
-    def get_methods(obj):
-        return dict(
-            [
-                (name, inspect.signature(fn))
-                for name, fn in inspect.getmembers(obj, inspect.isroutine)
-                if not (name.startswith("__") and name.endswith("__"))
-            ]
-        )
+def test_api_match(real: object, fake: object) -> None:
+    def get_methods(obj: Callable) -> dict[str, inspect.Signature]:
+        return {
+            name: inspect.signature(fn)
+            for name, fn in inspect.getmembers(obj, inspect.isroutine)
+            if not (name.startswith("__") and name.endswith("__"))
+        }
 
     real_methods = get_methods(real)
     fake_methods = get_methods(fake)

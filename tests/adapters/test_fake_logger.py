@@ -1,4 +1,4 @@
-from cosmic_python_sandbox.logger import FakeLogger
+from cosmic_python_sandbox.adapters.logger import FakeLogger
 
 
 def test_fake_logger():
@@ -9,16 +9,14 @@ def test_fake_logger():
     logger.fatal(3)
     logger.info(4)
     logger.notset(5)
-    logger.warn(6)
-    logger.warning(7)
+    logger.warning(6)
 
-    logger.log == [
+    assert logger.log == [
         "CRITICAL: 0",
         "DEBUG: 1",
         "ERROR: 2",
         "FATAL: 3",
         "INFO: 4",
         "NOTSET: 5",
-        "WARN: 6",
-        "WARNING: 7",
+        "WARNING: 6",
     ]

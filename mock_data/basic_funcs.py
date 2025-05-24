@@ -1,7 +1,6 @@
 def get_file_io_inf(path: str) -> str:
-    with open(path, "r") as f:
-        data = f.read()
-    return data
+    with open(path) as f:
+        return f.read()
 
 
 def process_data_io_inf(path: str) -> str:

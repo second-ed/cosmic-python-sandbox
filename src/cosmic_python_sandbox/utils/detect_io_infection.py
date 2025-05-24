@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 import glob
 import os
@@ -7,9 +9,8 @@ import pandas as pd
 
 
 def read_file(path: str) -> str:
-    with open(path, "r") as f:
-        data = f.read()
-    return data
+    with open(path) as f:
+        return f.read()
 
 
 def read_pkg_files(root: str, exclude: list[str]) -> dict[str, str]:
@@ -18,27 +19,27 @@ def read_pkg_files(root: str, exclude: list[str]) -> dict[str, str]:
 
 
 def get_nodes_from_body(
-    root_node,
-    ast_types,
-):
+    root_node: ast.AST,
+    ast_types: list[ast.AST],
+) -> list[ast.AST]:
     nodes = []
     for node in root_node.body:
         nodes += [n for n in ast.walk(node) if isinstance(n, tuple(ast_types))]
     return nodes
 
 
-def get_funcs(node):
+def get_funcs(node: ast.AST) -> list[ast.AST]:
     return get_nodes_from_body(node, [ast.FunctionDef])
 
 
-def get_calls(node):
+def get_calls(node: ast.AST) -> list[ast.AST]:
     return get_nodes_from_body(node, [ast.Call])
 
 
-def get_call_name(node):
+def get_call_name(node: ast.AST) -> str:
     if isinstance(node, ast.Name):
         return node.id
-    elif isinstance(node, ast.Attribute):
+    if isinstance(node, ast.Attribute):
         parts = []
         while isinstance(node, ast.Attribute):
             parts.append(node.attr)
@@ -75,7 +76,15 @@ def propagate_io_infection(calls_df: pd.DataFrame) -> pd.DataFrame:
 def find_io_infected_funcs(
     root: str,
     exclude: list[str] | None = None,
-    io_funcs: tuple[str] = ("open", "input", "read", "write", "load", "save", "pd.read"),
+    io_funcs: tuple[str] = (
+        "open",
+        "input",
+        "read",
+        "write",
+        "load",
+        "save",
+        "pd.read",
+    ),
 ) -> pd.DataFrame:
     exclude = exclude or []
     all_calls = []
@@ -88,13 +97,13 @@ def find_io_infected_funcs(
         for func in func_defs:
             calls = get_calls(func)
             for call in calls:
-                all_calls.append(
+                all_calls.append(  # noqa: PERF401
                     {
                         "module": name,
                         "func": func.name,
                         "line_no": call.func.lineno,
                         "calls": get_call_name(call.func),
-                    }
+                    },
                 )
 
     calls_df = pd.DataFrame(all_calls)
@@ -103,6 +112,12 @@ def find_io_infected_funcs(
     calls_df["io_func"] = calls_df.groupby("func")["io_call"].transform("any")
     calls_df = propagate_io_infection(calls_df)
     calls_df["io_call"] = np.where(
-        calls_df["calls"] == calls_df["infected_by"], True, calls_df["io_call"]
+        calls_df["calls"] == calls_df["infected_by"],
+        True,  # noqa: FBT003
+        calls_df["io_call"],
     )
-    return calls_df[(calls_df["io_func"] & calls_df["io_call"])].convert_dtypes().fillna("")
+    return (
+        calls_df[(calls_df["io_func"] & calls_df["io_call"])]
+        .convert_dtypes()
+        .fillna("")
+    )

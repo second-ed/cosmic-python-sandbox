@@ -1,16 +1,17 @@
+from contextlib import contextmanager
 from contextlib import nullcontext as does_not_raise
 
 import attrs
 import pytest
 
-from cosmic_python_sandbox.events import Event
-from cosmic_python_sandbox.handlers import EVENT_HANDLERS
-from cosmic_python_sandbox.io_mod import FakeIO
-from cosmic_python_sandbox.logger import FakeLogger
-from cosmic_python_sandbox.message_bus import (
+from cosmic_python_sandbox.adapters.io_mod import FakeIO
+from cosmic_python_sandbox.adapters.logger import FakeLogger
+from cosmic_python_sandbox.event_handlers.events import Event
+from cosmic_python_sandbox.event_handlers.handlers import EVENT_HANDLERS
+from cosmic_python_sandbox.service_layer.message_bus import (
     MessageBus,
 )
-from cosmic_python_sandbox.uow import UnitOfWork, UnitOfWorkProtocol
+from cosmic_python_sandbox.service_layer.uow import UnitOfWork, UnitOfWorkProtocol
 
 
 @attrs.define
@@ -33,45 +34,45 @@ class SomeEvent4(Event):
     pass
 
 
-def handle_event1(event: Event, uow: UnitOfWorkProtocol):
+def handle_event1(event: Event, uow: UnitOfWorkProtocol) -> Event:
     with uow:
         uow.logger.info({"guid": uow.guid, "event": event})
     return SomeEvent2()
 
 
-def handle_event2(event: Event, uow: UnitOfWorkProtocol):
+def handle_event2(event: Event, uow: UnitOfWorkProtocol) -> Event:
     with uow:
         uow.logger.info({"guid": uow.guid, "event": event})
     return SomeEvent3()
 
 
-def handle_event3(event: Event, uow: UnitOfWorkProtocol):
+def handle_event3(event: Event, uow: UnitOfWorkProtocol) -> Event:
     with uow:
         uow.logger.info({"guid": uow.guid, "event": event})
     return SomeEvent4()
 
 
-def handle_event4(event: Event, uow: UnitOfWorkProtocol):
+def handle_event4(event: Event, uow: UnitOfWorkProtocol) -> None:
     with uow:
         uow.repo.write("abc.ext", [1, 2, 3])
         assert uow.repo.read("abc.ext", "ext") == [1, 2, 3]
 
 
-def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol):
+def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol) -> list[Event]:
     with uow:
         uow.logger.info({"guid": uow.guid, "event": event})
-    return [SomeEvent3(), SomeEvent4(True)]
+    return [SomeEvent3(), SomeEvent4(priority_event=True)]
 
 
-def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
+def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol) -> Event:
     with uow:
         uow.logger.info({"guid": uow.guid, "event": event})
-    return SomeEvent4(True)
+    return SomeEvent4(priority_event=True)
 
 
 @pytest.mark.parametrize(
-    "handlers, starting_events, expected_log, expected_context",
-    (
+    ("handlers", "starting_events", "expected_log", "expected_context"),
+    [
         pytest.param(
             {
                 SomeEvent1: handle_event1,
@@ -124,7 +125,11 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
             [Event()],
             [
                 "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
-                "ERROR: {'guid': '123-abc', 'msg': ValueError('Must use a specialised event. Given Event(priority_event=False)')}",
+                (
+                    "ERROR: {'guid': '123-abc', "
+                    "'msg': ValueError('Must use a specialised event. "
+                    "Given Event(priority_event=False)')}"
+                ),
             ],
             pytest.raises(ValueError),
             id="Ensure single queue is executed correctly",
@@ -138,10 +143,15 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol):
             pytest.raises(ValueError),
             id="Ensure raises ValueError when given invalid events",
         ),
-    ),
+    ],
 )
-def test_message_bus(handlers, starting_events, expected_log, expected_context):
-    def fixed_guid():
+def test_message_bus(
+    handlers: dict,
+    starting_events: list,
+    expected_log: list,
+    expected_context: contextmanager,
+) -> None:
+    def fixed_guid() -> str:
         return "123-abc"
 
     with expected_context:

@@ -31,7 +31,7 @@ class FakeIO(IOWrapperProtocol):
     def setup(self) -> bool:
         return True
 
-    def read(self, path: str, file_type: FileType) -> Data:
+    def read(self, path: str, _: FileType) -> Data:
         return self.db[path]
 
     def write(self, path: str, data: Data) -> bool:

@@ -3,13 +3,14 @@ from pathlib import Path
 import pytest
 
 from cosmic_python_sandbox.utils.fake_io_generation import generate_fake_io, read_str
+from src.cosmic_python_sandbox.utils.fake_io_generation import format_code_str
 
 REPO_ROOT = Path(__file__).parents[2]
 
 
 @pytest.mark.parametrize(
-    "kwargs, expected_result_path",
-    (
+    ("kwargs", "expected_result_path"),
+    [
         (
             {
                 "db_exts": ["parquet"],
@@ -18,7 +19,9 @@ REPO_ROOT = Path(__file__).parents[2]
             },
             REPO_ROOT.joinpath("mock_data", "simple_fake_io.py"),
         ),
-    ),
+    ],
 )
 def test_generate_fake_io(kwargs, expected_result_path):
-    assert generate_fake_io(**kwargs) == read_str(expected_result_path)
+    assert format_code_str(generate_fake_io(**kwargs)) == format_code_str(
+        read_str(expected_result_path)
+    )

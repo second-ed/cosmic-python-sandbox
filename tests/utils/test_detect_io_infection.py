@@ -8,8 +8,8 @@ REPO_ROOT = Path(__file__).parents[2]
 
 
 @pytest.mark.parametrize(
-    "inp_root, expected_result",
-    (
+    ("inp_root", "expected_result"),
+    [
         pytest.param(
             REPO_ROOT.joinpath("mock_data"),
             [
@@ -25,7 +25,7 @@ REPO_ROOT = Path(__file__).parents[2]
                 {
                     "module": "basic_funcs.py",
                     "func": "process_data_io_inf",
-                    "line_no": 8,
+                    "line_no": 7,
                     "calls": "get_file_io_inf",
                     "io_call": True,
                     "io_func": True,
@@ -33,7 +33,7 @@ REPO_ROOT = Path(__file__).parents[2]
                 },
             ],
         ),
-    ),
+    ],
 )
 def test_find_io_infected_funcs(inp_root, expected_result):
     assert find_io_infected_funcs(inp_root).to_dict("records") == expected_result

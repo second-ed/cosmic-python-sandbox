@@ -4,9 +4,9 @@ from collections.abc import Sequence
 import attrs
 from attrs.validators import instance_of
 
-from cosmic_python_sandbox.events import Event
-from cosmic_python_sandbox.handlers import EventHandlers
-from cosmic_python_sandbox.uow import UnitOfWorkProtocol
+from cosmic_python_sandbox.event_handlers.events import Event
+from cosmic_python_sandbox.event_handlers.handlers import EventHandlers
+from cosmic_python_sandbox.service_layer.uow import UnitOfWorkProtocol
 
 
 @attrs.define
@@ -15,12 +15,15 @@ class MessageBus:
     uow: UnitOfWorkProtocol = attrs.field(validator=instance_of(UnitOfWorkProtocol))
     queue: deque = attrs.field(default=attrs.Factory(deque))
 
-    def add_events(self, events: Sequence[Event]):
-        if not isinstance(events, Sequence) or not all(isinstance(evt, Event) for evt in events):
-            raise ValueError(f"{events} must be a Sequence of Event types")
+    def add_events(self, events: Sequence[Event]) -> None:
+        if not isinstance(events, Sequence) or not all(
+            isinstance(evt, Event) for evt in events
+        ):
+            msg = f"{events} must be a Sequence of Event types"
+            raise ValueError(msg)
         self.queue.extend(events)
 
-    def handle_event(self):
+    def handle_event(self) -> None:
         event = self.queue.popleft()
         result = self.event_handlers[type(event)](event, self.uow)
 
@@ -45,6 +48,6 @@ class MessageBus:
             if back:
                 self.queue.extend(back)
 
-    def handle_events(self):
+    def handle_events(self) -> None:
         while self.queue:
             self.handle_event()

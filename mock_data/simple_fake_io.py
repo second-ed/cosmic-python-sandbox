@@ -1,5 +1,9 @@
 """Example FakeIO class that covers most operations.
-Fakes an editable db and external source that is read-only."""
+
+Fakes an editable db and external source that is read-only.
+"""
+
+from __future__ import annotations
 
 import hashlib
 import os
@@ -10,33 +14,40 @@ Data = TypeVar("Data")
 
 
 class FakeIO:
-    def __init__(self, db: dict = None, external_src: dict = None, strict: bool = True):
+    def __init__(
+        self,
+        db: dict | None = None,
+        external_src: dict | None = None,
+        *,
+        strict: bool = True,
+    ) -> None:
         self.db = db or {}
         self.external_src = external_src or {}
         self.log = []
         self.strict = strict
 
-    def reset_db(self):
+    def reset_db(self) -> None:
         self.db = {}
 
     def _check_db(self, path: str, ext: str) -> None:
         if path not in self.db:
-            raise FileNotFoundError(f"{path = } not in {list(self.db.keys()) = }")
+            msg = f"{path = } not in {list(self.db.keys()) = }"
+            raise FileNotFoundError(msg)
 
         if not self.strict:
             return
 
         path_ext = os.path.splitext(path)[-1]
-        if path_ext != "":
-            if not path_ext.endswith(ext):
-                raise ValueError(f"Path does not have expected ext: {path = } {ext = }")
+        if path_ext != "" and not path_ext.endswith(ext):
+            msg = f"Path does not have expected ext: {path = } {ext = }"
+            raise ValueError(msg)
 
-    def _read_db(self, path: str, ext: str, **kwargs) -> Data:
+    def _read_db(self, path: str, ext: str, **kwargs: dict) -> Data:
         self.log.append(("read", path, kwargs))
         self._check_db(path, ext)
         return self.db[path]
 
-    def _write_db(self, data: Data, path: str, **kwargs) -> bool:
+    def _write_db(self, data: Data, path: str, **kwargs: dict) -> bool:
         self.log.append(("write", path, kwargs))
         self.db[path] = data
         return True
@@ -73,17 +84,17 @@ class FakeIO:
 
     def get_md5(self, path: str) -> str:
         self.log.append(("get_md5", path))
-        return hashlib.md5(path.encode()).hexdigest()
+        return hashlib.md5(path.encode()).hexdigest()  # noqa: S324
 
-    def read_parquet(self, path: str, **kwargs) -> Data:
+    def read_parquet(self, path: str, **kwargs: dict) -> Data:
         return self._read_db(path, "parquet", **kwargs)
 
-    def write_parquet(self, data: Data, path: str, **kwargs) -> bool:
+    def write_parquet(self, data: Data, path: str, **kwargs: dict) -> bool:
         return self._write_db(data, path, **kwargs)
 
-    def _read_external_src(self, path: str, **kwargs) -> Data:
+    def _read_external_src(self, path: str, **kwargs: dict) -> Data:
         self.log.append(("external_read", path, kwargs))
         return self.external_src[path]
 
-    def query_api(self, path: str, **kwargs) -> Data:
+    def query_api(self, path: str, **kwargs: dict) -> Data:
         return self._read_external_src(path, **kwargs)

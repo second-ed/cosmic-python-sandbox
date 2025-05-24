@@ -1,17 +1,17 @@
 import pytest
 
-from cosmic_python_sandbox.events import CopyFile, DeleteFile, MoveFile
-from cosmic_python_sandbox.handlers import EVENT_HANDLERS
-from cosmic_python_sandbox.io_mod import FakeIO
-from cosmic_python_sandbox.logger import FakeLogger
-from cosmic_python_sandbox.message_bus import (
+from cosmic_python_sandbox.adapters.io_mod import FakeIO
+from cosmic_python_sandbox.adapters.logger import FakeLogger
+from cosmic_python_sandbox.event_handlers.events import CopyFile, DeleteFile, MoveFile
+from cosmic_python_sandbox.event_handlers.handlers import EVENT_HANDLERS
+from cosmic_python_sandbox.service_layer.message_bus import (
     MessageBus,
 )
-from cosmic_python_sandbox.uow import UnitOfWork
+from cosmic_python_sandbox.service_layer.uow import UnitOfWork
 
 
 @pytest.fixture
-def db():
+def db() -> dict[str, str]:
     return {
         "some_filepath1.py": "import this",
         "some_filepath2.sh": "echo blah",
@@ -19,8 +19,8 @@ def db():
 
 
 @pytest.mark.parametrize(
-    "starting_events, expected_db",
-    (
+    ("starting_events", "expected_db"),
+    [
         pytest.param(
             [
                 CopyFile(src="some_filepath1.py", dst="another_filepath2.py"),
@@ -59,7 +59,7 @@ def db():
                 "better_name.sh": "echo blah",
             },
         ),
-    ),
+    ],
 )
 def test_handler(db, starting_events, expected_db):
     fake_io = FakeIO(db)
