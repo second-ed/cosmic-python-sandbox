@@ -97,10 +97,7 @@ def create_input_func(input_cmd: str, ext: str, tab: str) -> tuple[str]:
 
 def create_output_func(output_cmd: str, ext: str, tab: str) -> tuple[str]:
     return (
-        (
-            f"{tab}def {output_cmd}_{ext}(self, data: Data, path: str, **kwargs: dict)"
-            " -> bool:"
-        ),
+        (f"{tab}def {output_cmd}_{ext}(self, data: Data, path: str, **kwargs: dict) -> bool:"),
         f"{tab * 2}return self._write_db(data, path, **kwargs)",
     )
 

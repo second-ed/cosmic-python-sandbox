@@ -16,14 +16,18 @@ from cosmic_python_sandbox.event_handlers import events
         pytest.param(
             {"action": "copy", "src": "some_file.py", "dst": "some_other_file.py"},
             events.CopyFile(
-                priority_event=False, src="some_file.py", dst="some_other_file.py"
+                priority_event=False,
+                src="some_file.py",
+                dst="some_other_file.py",
             ),
             does_not_raise(),
         ),
         pytest.param(
             {"action": "move", "src": "some_file.py", "dst": "renamed_file.py"},
             events.MoveFile(
-                priority_event=False, src="some_file.py", dst="renamed_file.py"
+                priority_event=False,
+                src="some_file.py",
+                dst="renamed_file.py",
             ),
             does_not_raise(),
         ),

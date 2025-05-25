@@ -116,8 +116,4 @@ def find_io_infected_funcs(
         True,  # noqa: FBT003
         calls_df["io_call"],
     )
-    return (
-        calls_df[(calls_df["io_func"] & calls_df["io_call"])]
-        .convert_dtypes()
-        .fillna("")
-    )
+    return calls_df[(calls_df["io_func"] & calls_df["io_call"])].convert_dtypes().fillna("")

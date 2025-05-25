@@ -16,9 +16,7 @@ class MessageBus:
     queue: deque = attrs.field(default=attrs.Factory(deque))
 
     def add_events(self, events: Sequence[Event]) -> None:
-        if not isinstance(events, Sequence) or not all(
-            isinstance(evt, Event) for evt in events
-        ):
+        if not isinstance(events, Sequence) or not all(isinstance(evt, Event) for evt in events):
             msg = f"{events} must be a Sequence of Event types"
             raise ValueError(msg)
         self.queue.extend(events)

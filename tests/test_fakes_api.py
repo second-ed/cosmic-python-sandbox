@@ -30,14 +30,17 @@ class FakeMismatchingSignature:
     ("real", "fake"),
     [
         pytest.param(
-            SanityCheck(), FakeSanityCheck(), id="ensure matching public methods pass"
+            SanityCheck(),
+            FakeSanityCheck(),
+            id="ensure matching public methods pass",
         ),
         pytest.param(
             SanityCheck(),
             FakeMissingMethod(),
             id="ensure fails if fake missing method",
             marks=pytest.mark.xfail(
-                reason="ensure fails if fake missing method", strict=True
+                reason="ensure fails if fake missing method",
+                strict=True,
             ),
         ),
         pytest.param(

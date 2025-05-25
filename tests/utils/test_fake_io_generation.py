@@ -23,5 +23,5 @@ REPO_ROOT = Path(__file__).parents[2]
 )
 def test_generate_fake_io(kwargs, expected_result_path):
     assert format_code_str(generate_fake_io(**kwargs)) == format_code_str(
-        read_str(expected_result_path)
+        read_str(expected_result_path),
     )
