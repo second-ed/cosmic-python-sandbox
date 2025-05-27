@@ -1,12 +1,12 @@
 from collections.abc import Callable, Sequence
 
-from cosmic_python_sandbox.event_handlers.events import (
+from cosmic_python_sandbox.service_layer.uow import UnitOfWorkProtocol
+from cosmic_python_sandbox.usecases.events import (
     CopyFile,
     DeleteFile,
     Event,
     MoveFile,
 )
-from cosmic_python_sandbox.service_layer.uow import UnitOfWorkProtocol
 
 EventHandlers = dict[type, Callable[[Event], Event | Sequence[Event] | None]]
 

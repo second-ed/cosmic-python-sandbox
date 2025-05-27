@@ -4,9 +4,9 @@ from collections.abc import Sequence
 import attrs
 from attrs.validators import instance_of
 
-from cosmic_python_sandbox.event_handlers.events import Event
-from cosmic_python_sandbox.event_handlers.handlers import EventHandlers
 from cosmic_python_sandbox.service_layer.uow import UnitOfWorkProtocol
+from cosmic_python_sandbox.usecases.events import Event
+from cosmic_python_sandbox.usecases.handlers import EventHandlers
 
 
 @attrs.define

@@ -6,12 +6,12 @@ import pytest
 
 from cosmic_python_sandbox.adapters.io_mod import FakeIO
 from cosmic_python_sandbox.adapters.logger import FakeLogger
-from cosmic_python_sandbox.event_handlers.events import Event
-from cosmic_python_sandbox.event_handlers.handlers import EVENT_HANDLERS
 from cosmic_python_sandbox.service_layer.message_bus import (
     MessageBus,
 )
 from cosmic_python_sandbox.service_layer.uow import UnitOfWork, UnitOfWorkProtocol
+from cosmic_python_sandbox.usecases.events import Event
+from cosmic_python_sandbox.usecases.handlers import EVENT_HANDLERS
 
 
 @attrs.define
