@@ -9,8 +9,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from types import TracebackType
 
-    from src.cosmic_python_sandbox.adapters.io_mod import IOWrapperProtocol
-    from src.cosmic_python_sandbox.adapters.logger import LoggerProtocol
+    from cosmic_python_sandbox.adapters.io_mod import IOWrapperProtocol
+    from cosmic_python_sandbox.adapters.logger import LoggerProtocol
 
 
 @runtime_checkable
