@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 import attrs
 
+from cosmic_python_sandbox.adapters.clock import clock_now
+
 if TYPE_CHECKING:
     from collections.abc import Callable
     from types import TracebackType
@@ -29,12 +31,17 @@ class UnitOfWorkProtocol(Protocol):
 class UnitOfWork:
     repo: IOWrapperProtocol = attrs.field()
     logger: LoggerProtocol = attrs.field()
-    guid_generator: Callable = attrs.field(default=uuid.uuid4)
+    clock_func: Callable[[str], str] = attrs.field(default=clock_now)
+    guid_func: Callable[[], str] = attrs.field(default=uuid.uuid4)
     guid: str = attrs.field(default="")
+    start_time: str = attrs.field(default="")
 
     def __enter__(self) -> None:
-        self.guid = str(self.guid_generator())
-        self.logger.info({"guid": self.guid, "msg": "Initialising UOW"})
+        self.guid = str(self.guid_func())
+        self.start_time = self.clock_func()
+        self.logger.info(
+            {"guid": self.guid, "start_time": self.start_time, "msg": "Initialising UOW"},
+        )
 
         # generic setup ops
         self.repo.setup()
@@ -47,9 +54,11 @@ class UnitOfWork:
         exc_tb: TracebackType | None,
     ) -> None:
         if exc_type is not None:
-            self.logger.error({"guid": self.guid, "msg": exc_val})
+            self.logger.error({"guid": self.guid, "end_time": self.clock_func(), "msg": exc_val})
         else:
-            self.logger.info({"guid": self.guid, "msg": "Completed UOW"})
+            self.logger.info(
+                {"guid": self.guid, "end_time": self.clock_func(), "msg": "Completed UOW"},
+            )
 
         # clean up afterwards
         self.repo.teardown()

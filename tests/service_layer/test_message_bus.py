@@ -4,6 +4,7 @@ from contextlib import nullcontext as does_not_raise
 import attrs
 import pytest
 
+from cosmic_python_sandbox.adapters.clock import fake_clock_now
 from cosmic_python_sandbox.adapters.io_mod import FakeIO
 from cosmic_python_sandbox.adapters.logger import FakeLogger
 from cosmic_python_sandbox.service_layer.message_bus import (
@@ -82,17 +83,17 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol) -> Event:
             },
             [SomeEvent1()],
             [
-                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
                 "INFO: {'guid': '123-abc', 'event': SomeEvent1(priority_event=False)}",
-                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
                 "INFO: {'guid': '123-abc', 'event': SomeEvent2(priority_event=False)}",
-                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
                 "INFO: {'guid': '123-abc', 'event': SomeEvent3(priority_event=False)}",
-                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': 'Completed UOW'}",
             ],
             does_not_raise(),
             id="Ensure simple linear queue is executed correctly",
@@ -106,16 +107,16 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol) -> Event:
             },
             [SomeEvent2()],
             [
-                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
                 "INFO: {'guid': '123-abc', 'event': SomeEvent2(priority_event=False)}",
-                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
                 "INFO: {'guid': '123-abc', 'event': SomeEvent3(priority_event=False)}",
-                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
-                "INFO: {'guid': '123-abc', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': 'Completed UOW'}",
+                "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
+                "INFO: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': 'Completed UOW'}",
             ],
             does_not_raise(),
             id="Ensure simple priority queue is executed correctly",
@@ -124,12 +125,8 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol) -> Event:
             EVENT_HANDLERS,
             [Event()],
             [
-                "INFO: {'guid': '123-abc', 'msg': 'Initialising UOW'}",
-                (
-                    "ERROR: {'guid': '123-abc', "
-                    "'msg': ValueError('Must use a specialised event. "
-                    "Given Event(priority_event=False)')}"
-                ),
+                "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
+                "ERROR: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': ValueError('Must use a specialised event. Given Event(priority_event=False)')}",
             ],
             pytest.raises(ValueError),
             id="Ensure single queue is executed correctly",
@@ -157,7 +154,12 @@ def test_message_bus(
     with expected_context:
         fake_io = FakeIO()
         logger = FakeLogger()
-        uow = UnitOfWork(repo=fake_io, logger=logger, guid_generator=fixed_guid)
+        uow = UnitOfWork(
+            repo=fake_io,
+            logger=logger,
+            guid_func=fixed_guid,
+            clock_func=fake_clock_now,
+        )
         bus = MessageBus(uow=uow, event_handlers=handlers)
         bus.add_events(starting_events)
         bus.handle_events()
