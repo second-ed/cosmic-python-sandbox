@@ -25,7 +25,7 @@ class IOWrapperProtocol(Protocol):
 
 
 @attrs.define
-class FakeIO(IOWrapperProtocol):
+class FakeIO:
     db: dict = attrs.field(default=attrs.Factory(dict))
 
     def setup(self) -> bool:
