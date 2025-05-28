@@ -11,8 +11,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from types import TracebackType
 
-    from cosmic_python_sandbox.adapters.io_mod import IOWrapperProtocol
     from cosmic_python_sandbox.adapters.logger import LoggerProtocol
+    from cosmic_python_sandbox.adapters.repo import RepoProtocol
 
 
 @runtime_checkable
@@ -29,7 +29,7 @@ class UnitOfWorkProtocol(Protocol):
 
 @attrs.define
 class UnitOfWork:
-    repo: IOWrapperProtocol = attrs.field()
+    repo: RepoProtocol = attrs.field()
     logger: LoggerProtocol = attrs.field()
     clock_func: Callable[[str], str] = attrs.field(default=clock_now)
     guid_func: Callable[[], str] = attrs.field(default=uuid.uuid4)
@@ -44,7 +44,7 @@ class UnitOfWork:
         )
 
         # generic setup ops
-        self.repo.setup()
+        self.repo.io.setup()
         return self
 
     def __exit__(
@@ -61,4 +61,4 @@ class UnitOfWork:
             )
 
         # clean up afterwards
-        self.repo.teardown()
+        self.repo.io.teardown()

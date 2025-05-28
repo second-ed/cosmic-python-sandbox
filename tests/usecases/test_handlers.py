@@ -1,7 +1,7 @@
 import pytest
 
-from cosmic_python_sandbox.adapters.io_mod import FakeIO
 from cosmic_python_sandbox.adapters.logger import FakeLogger
+from cosmic_python_sandbox.adapters.repo import FakeRepo
 from cosmic_python_sandbox.service_layer.message_bus import (
     MessageBus,
 )
@@ -62,13 +62,13 @@ def db() -> dict[str, str]:
     ],
 )
 def test_handler(db, starting_events, expected_db):
-    fake_io = FakeIO(db)
+    fake_repo = FakeRepo(db=db)
     logger = FakeLogger()
-    uow = UnitOfWork(repo=fake_io, logger=logger)
+    uow = UnitOfWork(repo=fake_repo, logger=logger)
     bus = MessageBus(uow=uow, event_handlers=EVENT_HANDLERS)
     bus.add_events(starting_events)
     bus.handle_events()
-    assert fake_io.db == expected_db
+    assert fake_repo.db == expected_db
 
     # make sure guids in all logs
     assert all("{'guid': " in log for log in bus.uow.logger.log)

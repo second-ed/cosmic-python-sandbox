@@ -5,8 +5,8 @@ import attrs
 import pytest
 
 from cosmic_python_sandbox.adapters.clock import fake_clock_now
-from cosmic_python_sandbox.adapters.io_mod import FakeIO
 from cosmic_python_sandbox.adapters.logger import FakeLogger
+from cosmic_python_sandbox.adapters.repo import FakeRepo
 from cosmic_python_sandbox.service_layer.message_bus import (
     MessageBus,
 )
@@ -55,8 +55,8 @@ def handle_event3(event: Event, uow: UnitOfWorkProtocol) -> Event:
 
 def handle_event4(event: Event, uow: UnitOfWorkProtocol) -> None:
     with uow:
-        uow.repo.write("abc.ext", [1, 2, 3])
-        assert uow.repo.read("abc.ext", "ext") == [1, 2, 3]
+        uow.repo.io.write("abc.ext", [1, 2, 3])
+        assert uow.repo.io.read("abc.ext", "ext") == [1, 2, 3]
 
 
 def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol) -> list[Event]:
@@ -152,10 +152,10 @@ def test_message_bus(
         return "123-abc"
 
     with expected_context:
-        fake_io = FakeIO()
+        fake_repo = FakeRepo()
         logger = FakeLogger()
         uow = UnitOfWork(
-            repo=fake_io,
+            repo=fake_repo,
             logger=logger,
             guid_func=fixed_guid,
             clock_func=fake_clock_now,
