@@ -3,6 +3,9 @@ from collections.abc import Callable
 
 import pytest
 
+import cosmic_python_sandbox.adapters.io_wrappers._io_protocol as io_protocol
+import cosmic_python_sandbox.adapters.io_wrappers.pd_wrapper as io_pd
+
 
 class SanityCheck:
     def method_a(self, a: int, b: float) -> float:
@@ -51,6 +54,11 @@ class FakeMismatchingSignature:
                 reason="ensure fails if fake not matching signature",
                 strict=True,
             ),
+        ),
+        pytest.param(
+            io_pd.PandasIOWrapper(),
+            io_protocol.FakeIOWrapper(),
+            id="ensure pandas wrapper matches fake",
         ),
     ],
 )

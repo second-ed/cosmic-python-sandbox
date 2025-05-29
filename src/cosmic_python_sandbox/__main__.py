@@ -3,13 +3,13 @@ from cosmic_python_sandbox.service_layer.message_bus import MessageBus
 from cosmic_python_sandbox.service_layer.uow import UnitOfWork
 from cosmic_python_sandbox.usecases.events import CopyFile
 from cosmic_python_sandbox.usecases.handlers import EVENT_HANDLERS
-from src.cosmic_python_sandbox.adapters.io_wrappers._io_protocol import FakeIO
+from src.cosmic_python_sandbox.adapters.repo import FakeRepo
 
 if __name__ == "__main__":
     # add bootstrapping stuff here
     # essentially config
     logger = FakeLogger()
-    uow = UnitOfWork(repo=FakeIO(), logger=logger)
+    uow = UnitOfWork(repo=FakeRepo(), logger=logger)
 
     # where the stuff happens
     starting_events = [CopyFile(src="some/path.csv", dst="to/path.csv")]

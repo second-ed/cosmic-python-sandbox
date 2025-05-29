@@ -5,6 +5,7 @@ import attrs
 import pytest
 
 from cosmic_python_sandbox.adapters.clock import fake_clock_now
+from cosmic_python_sandbox.adapters.io_wrappers._io_protocol import FileType
 from cosmic_python_sandbox.adapters.logger import FakeLogger
 from cosmic_python_sandbox.adapters.repo import FakeRepo
 from cosmic_python_sandbox.service_layer.message_bus import (
@@ -55,8 +56,8 @@ def handle_event3(event: Event, uow: UnitOfWorkProtocol) -> Event:
 
 def handle_event4(event: Event, uow: UnitOfWorkProtocol) -> None:
     with uow:
-        uow.repo.io.write("abc.ext", [1, 2, 3])
-        assert uow.repo.io.read("abc.ext", "ext") == [1, 2, 3]
+        uow.repo.io.write("abc.ext", [1, 2, 3], FileType.PARQUET)
+        assert uow.repo.io.read("abc.ext", FileType.PARQUET) == [1, 2, 3]
 
 
 def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol) -> list[Event]:
