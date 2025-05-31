@@ -23,7 +23,7 @@ class UnitOfWorkProtocol(Protocol):
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
+        _: TracebackType | None,
     ) -> None: ...
 
 
@@ -51,10 +51,16 @@ class UnitOfWork:
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
+        _: TracebackType | None,
     ) -> None:
         if exc_type is not None:
-            self.logger.error({"guid": self.guid, "end_time": self.clock_func(), "msg": exc_val})
+            self.logger.error(
+                {
+                    "guid": self.guid,
+                    "end_time": self.clock_func(),
+                    "msg": exc_val,
+                },
+            )
         else:
             self.logger.info(
                 {"guid": self.guid, "end_time": self.clock_func(), "msg": "Completed UOW"},
