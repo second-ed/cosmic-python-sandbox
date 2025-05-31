@@ -36,11 +36,3 @@ def delete_file(event: DeleteFile, uow: UnitOfWorkProtocol) -> None:
         uow.logger.info({"guid": uow.guid, "event": event})
         success = uow.repo.fs.delete(event.dst)
         uow.logger.info({"guid": uow.guid, "success": success})
-
-
-EVENT_HANDLERS = {
-    Event: example_handler,
-    CopyFile: copy_file,
-    MoveFile: move_file,
-    DeleteFile: delete_file,
-}
