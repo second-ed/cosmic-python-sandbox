@@ -1,5 +1,3 @@
-from collections.abc import Callable, Sequence
-
 from cosmic_python_sandbox.service_layer.uow import UnitOfWorkProtocol
 from cosmic_python_sandbox.usecases.events import (
     CopyFile,
@@ -7,8 +5,6 @@ from cosmic_python_sandbox.usecases.events import (
     Event,
     MoveFile,
 )
-
-EventHandlers = dict[type, Callable[[Event], Event | Sequence[Event] | None]]
 
 
 def example_handler(event: Event, uow: UnitOfWorkProtocol) -> None:
