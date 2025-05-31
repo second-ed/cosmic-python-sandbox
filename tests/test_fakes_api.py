@@ -4,7 +4,7 @@ from collections.abc import Callable
 import pytest
 
 import cosmic_python_sandbox.adapters.io_wrappers._io_protocol as io_protocol
-import cosmic_python_sandbox.adapters.io_wrappers.pd_wrapper as io_pd
+import cosmic_python_sandbox.adapters.io_wrappers.pd_io as io_pd
 
 
 class SanityCheck:
@@ -56,7 +56,7 @@ class FakeMismatchingSignature:
             ),
         ),
         pytest.param(
-            io_pd.PandasIOWrapper(),
+            io_pd.PandasIO(),
             io_protocol.FakeIOWrapper(),
             id="ensure pandas wrapper matches fake",
         ),

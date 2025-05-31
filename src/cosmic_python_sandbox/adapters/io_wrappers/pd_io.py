@@ -5,7 +5,7 @@ from cosmic_python_sandbox.adapters.io_wrappers._io_protocol import Data, FileTy
 
 
 @attrs.define
-class PandasIOWrapper:
+class PandasIO:
     def setup(self) -> bool:
         return True
 
