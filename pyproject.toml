@@ -37,7 +37,7 @@ omit = [
 ]
 
 [tool.vulture]
-min_confidence = 60
+min_confidence = 75
 make_whitelist = true
 paths = ["src/"]
 sort_by_size = false
