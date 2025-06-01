@@ -10,6 +10,7 @@ class FileType(Enum):
     PARQUET = auto()
     CSV = auto()
     JSON = auto()
+    SQLITE3 = auto()
 
 
 @runtime_checkable
