@@ -65,12 +65,12 @@ class FakeMismatchingSignature:
         pytest.param(
             pl_io.PolarsIO(),
             io_protocol.FakeIOWrapper(),
-            id="ensure pandas wrapper matches fake",
+            id="ensure polars wrapper matches fake",
         ),
         pytest.param(
             local_fs_wrapper.LocalFileSystem(),
             fs_protocol.FakeFileSystem(),
-            id="ensure pandas wrapper matches fake",
+            id="ensure local file system wrapper matches fake",
         ),
     ],
 )
