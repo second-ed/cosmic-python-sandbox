@@ -17,11 +17,11 @@ class FileSystemProtocol(Protocol):
 
 @attrs.define
 class FakeFileSystem:
-    db: dict = attrs.field()
+    db: dict = attrs.field(default=attrs.Factory(dict))
     log: list = attrs.field(default=attrs.Factory(list))
 
-    def list(self, root: str) -> list[str]:
-        self.log.append({"func": "list", "root": root})
+    def list(self, root: str, pattern: str = "*") -> list[str]:
+        self.log.append({"func": "list", "root": root, "pattern": pattern})
         return [key for key in self.db if key.startswith(root)]
 
     def copy(self, src: str, dst: str) -> bool:

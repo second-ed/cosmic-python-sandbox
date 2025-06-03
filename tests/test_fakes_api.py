@@ -4,7 +4,9 @@ from collections.abc import Callable
 import pytest
 
 import cosmic_python_sandbox.adapters.io_wrappers._io_protocol as io_protocol
-import cosmic_python_sandbox.adapters.io_wrappers.pd_io as io_pd
+from cosmic_python_sandbox.adapters.fs_wrappers import _fs_protocol as fs_protocol
+from cosmic_python_sandbox.adapters.fs_wrappers import local_fs_wrapper
+from cosmic_python_sandbox.adapters.io_wrappers import pd_io, pl_io
 
 
 class SanityCheck:
@@ -56,8 +58,18 @@ class FakeMismatchingSignature:
             ),
         ),
         pytest.param(
-            io_pd.PandasIO(),
+            pd_io.PandasIO(),
             io_protocol.FakeIOWrapper(),
+            id="ensure pandas wrapper matches fake",
+        ),
+        pytest.param(
+            pl_io.PolarsIO(),
+            io_protocol.FakeIOWrapper(),
+            id="ensure pandas wrapper matches fake",
+        ),
+        pytest.param(
+            local_fs_wrapper.LocalFileSystem(),
+            fs_protocol.FakeFileSystem(),
             id="ensure pandas wrapper matches fake",
         ),
     ],
@@ -77,4 +89,9 @@ def test_api_match(real: object, fake: object) -> None:
     assert set(real_methods) - set(fake_methods) == set()
 
     # all methods in the real have the same signature as those in the fake
-    assert set(real_methods.values()) - set(fake_methods.values()) == set()
+    mismatches = [
+        {"method": key, "real": method, "fake": fake_methods[key]}
+        for key, method in real_methods.items()
+        if fake_methods[key] != method
+    ]
+    assert mismatches == []

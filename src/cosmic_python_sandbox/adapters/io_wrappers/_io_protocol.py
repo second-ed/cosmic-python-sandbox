@@ -1,9 +1,11 @@
 from enum import Enum, auto
-from typing import Protocol, TypeVar, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 import attrs
+import pandas as pd
+import polars as pl
 
-Data = TypeVar("Data")
+Data = pd.DataFrame | pl.DataFrame | dict
 
 
 class FileType(Enum):
