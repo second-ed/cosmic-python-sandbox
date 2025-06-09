@@ -45,7 +45,7 @@ namespace adapters {
     }
 }
 
-namespace use_cases {
+namespace usecases {
     class Event {
         priority_event: bool
     }
