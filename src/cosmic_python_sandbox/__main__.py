@@ -1,8 +1,7 @@
 from cosmic_python_sandbox.adapters.logger import FakeLogger
 from cosmic_python_sandbox.service_layer.message_bus import MessageBus
 from cosmic_python_sandbox.service_layer.uow import UnitOfWork
-from cosmic_python_sandbox.usecases.events import CopyFile
-from cosmic_python_sandbox.usecases.handlers import EVENT_HANDLERS
+from cosmic_python_sandbox.usecases import EVENT_HANDLERS, CopyFile
 from src.cosmic_python_sandbox.adapters.repo import FakeRepo
 
 if __name__ == "__main__":

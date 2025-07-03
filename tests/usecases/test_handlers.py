@@ -6,8 +6,7 @@ from cosmic_python_sandbox.service_layer.message_bus import (
     MessageBus,
 )
 from cosmic_python_sandbox.service_layer.uow import UnitOfWork
-from cosmic_python_sandbox.usecases import EVENT_HANDLERS
-from cosmic_python_sandbox.usecases.events import CopyFile, DeleteFile, MoveFile
+from cosmic_python_sandbox.usecases import EVENT_HANDLERS, CopyFile, DeleteFile, MoveFile
 
 
 @pytest.fixture
