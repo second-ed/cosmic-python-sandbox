@@ -9,9 +9,8 @@ if __name__ == "__main__":
     # essentially config
     logger = FakeLogger()
     uow = UnitOfWork(repo=FakeRepo(), logger=logger)
+    bus = MessageBus(uow=uow, event_handlers=EVENT_HANDLERS)
 
     # where the stuff happens
     starting_events = [CopyFile(src="some/path.csv", dst="to/path.csv")]
-    bus = MessageBus(uow=uow, event_handlers=EVENT_HANDLERS)
-    bus.add_events(starting_events)
-    bus.handle_events()
+    bus.add_events(starting_events).handle_events()

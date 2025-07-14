@@ -161,7 +161,6 @@ def test_message_bus(
             clock_func=fake_clock_now,
         )
         bus = MessageBus(uow=uow, event_handlers=handlers)
-        bus.add_events(starting_events)
-        bus.handle_events()
+        bus.add_events(starting_events).handle_events()
 
     assert bus.uow.logger.log == expected_log

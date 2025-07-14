@@ -64,9 +64,11 @@ def test_handler(db, starting_events, expected_db):
     fake_repo = FakeRepo(db=db)
     logger = FakeLogger()
     uow = UnitOfWork(repo=fake_repo, logger=logger, guid_func=lambda: "123-abc")
-    bus = MessageBus(uow=uow, event_handlers=EVENT_HANDLERS)
-    bus.add_events(starting_events)
-    bus.handle_events()
+    bus = (
+        MessageBus(uow=uow, event_handlers=EVENT_HANDLERS)
+        .add_events(starting_events)
+        .handle_events()
+    )
     assert fake_repo.db == expected_db
 
     # make sure guids in all logs

@@ -1,5 +1,6 @@
 from collections import deque
 from collections.abc import Sequence
+from typing import Self
 
 import attrs
 from attrs.validators import instance_of
@@ -14,11 +15,12 @@ class MessageBus:
     uow: UnitOfWorkProtocol = attrs.field(validator=instance_of(UnitOfWorkProtocol))
     queue: deque = attrs.field(default=attrs.Factory(deque))
 
-    def add_events(self, events: Sequence[Event]) -> None:
+    def add_events(self, events: Sequence[Event]) -> Self:
         if not isinstance(events, Sequence) or not all(isinstance(evt, Event) for evt in events):
             msg = f"{events} must be a Sequence of Event types"
             raise ValueError(msg)
         self.queue.extend(events)
+        return self
 
     def handle_event(self) -> None:
         event = self.queue.popleft()
@@ -45,6 +47,7 @@ class MessageBus:
             if back:
                 self.queue.extend(back)
 
-    def handle_events(self) -> None:
+    def handle_events(self) -> Self:
         while self.queue:
             self.handle_event()
+        return self
