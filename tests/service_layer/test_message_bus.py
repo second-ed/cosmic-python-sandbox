@@ -4,7 +4,7 @@ from contextlib import nullcontext as does_not_raise
 import attrs
 import pytest
 
-from cosmic_python_sandbox.adapters.clock import fake_clock_now
+from cosmic_python_sandbox.adapters.clock import fake_clock_now, fake_guid
 from cosmic_python_sandbox.adapters.io_wrappers._io_protocol import FileType
 from cosmic_python_sandbox.adapters.logger import FakeLogger
 from cosmic_python_sandbox.adapters.repo import FakeRepo
@@ -148,16 +148,13 @@ def test_message_bus(
     expected_log: list,
     expected_context: contextmanager,
 ) -> None:
-    def fixed_guid() -> str:
-        return "123-abc"
-
     with expected_context:
         fake_repo = FakeRepo()
         logger = FakeLogger()
         uow = UnitOfWork(
             repo=fake_repo,
             logger=logger,
-            guid_func=fixed_guid,
+            guid_func=fake_guid,
             clock_func=fake_clock_now,
         )
         bus = MessageBus(uow=uow, event_handlers=handlers)
