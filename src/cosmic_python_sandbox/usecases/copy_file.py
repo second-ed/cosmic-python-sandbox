@@ -2,7 +2,7 @@ import attrs
 from attrs.validators import min_len
 
 from cosmic_python_sandbox.service_layer.uow import UnitOfWorkProtocol
-from cosmic_python_sandbox.usecases._event import Event
+from cosmic_python_sandbox.usecases._event import Event, catch_err
 
 
 @attrs.define
@@ -11,6 +11,7 @@ class CopyFile(Event):
     dst: str = attrs.field(default="", validator=[min_len(3)])
 
 
+@catch_err
 def copy_file(event: CopyFile, uow: UnitOfWorkProtocol) -> None:
     with uow:
         uow.logger.info({"guid": uow.guid, "event": event})

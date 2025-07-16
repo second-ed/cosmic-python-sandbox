@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import functools
+from typing import TYPE_CHECKING, Any
 
 import attrs
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from types import TracebackType
 
     from cosmic_python_sandbox.service_layer.uow import UnitOfWorkProtocol
 
@@ -45,10 +47,38 @@ class Err:
     error: Exception = attrs.field(validator=attrs.validators.instance_of(Exception))
     err_type: BaseException = attrs.field(init=False)
     err_msg: str = attrs.field(init=False)
-    traceback: dict = attrs.field(init=False)
+    details: dict = attrs.field(init=False)
 
     def __attrs_post_init__(self) -> None:
         self.err_type = type(self.error)
         self.err_msg = str(self.error)
-        self.traceback = self.error.__traceback__.tb_frame.f_locals
-        self.traceback["line_no"] = self.error.__traceback__.tb_lineno
+        self.details = self.extract_details(self.error.__traceback__)
+
+    def extract_details(self, tb: TracebackType) -> list[dict[str, Any]]:
+        trace_info = []
+        while tb:
+            frame = tb.tb_frame
+            trace_info.append(
+                {
+                    "file": frame.f_code.co_filename,
+                    "func": frame.f_code.co_name,
+                    "line_no": tb.tb_lineno,
+                    "locals": frame.f_locals,
+                },
+            )
+            tb = tb.tb_next
+        return trace_info
+
+
+Result = Ok | Err
+
+
+def catch_err(func: callable) -> callable:
+    @functools.wraps(func)
+    def wrapper(event: Event, uow: UnitOfWorkProtocol) -> Result:
+        try:
+            return Ok(func(event, uow))
+        except Exception as e:  # noqa: BLE001
+            return Err(event, e)
+
+    return wrapper
