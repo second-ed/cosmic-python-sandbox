@@ -1,6 +1,6 @@
 from collections.abc import Callable, Sequence
 
-from ._event import Event, example_handler
+from ._event import Err, Event, Ok, Result, catch_err, example_handler
 from .copy_file import CopyFile, copy_file
 from .delete_file import DeleteFile, delete_file
 from .move_file import MoveFile, move_file
@@ -38,9 +38,13 @@ __all__ = [
     "EVENT_HANDLERS",
     "CopyFile",
     "DeleteFile",
+    "Err",
     "Event",
     "EventHandlers",
     "MoveFile",
+    "Ok",
+    "Result",
+    "catch_err",
     "copy_file",
     "delete_file",
     "example_handler",

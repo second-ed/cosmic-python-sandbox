@@ -22,15 +22,9 @@ class Event:
         return cls(**filtered)
 
 
-def example_handler(event: Event, uow: UnitOfWorkProtocol) -> None:
-    with uow:
-        err_msg = f"Must use a specialised event. Given {event}"
-        raise ValueError(err_msg)
-
-
 @attrs.define
 class Ok:
-    event: Event | Sequence[Event] | None = attrs.field(
+    inner: Event | Sequence[Event] | None = attrs.field(
         default=None,
         validator=attrs.validators.optional(
             attrs.validators.or_(
@@ -82,3 +76,10 @@ def catch_err(func: callable) -> callable:
             return Err(event, e)
 
     return wrapper
+
+
+@catch_err
+def example_handler(event: Event, uow: UnitOfWorkProtocol) -> None:
+    with uow:
+        err_msg = f"Must use a specialised event. Given {event}"
+        raise ValueError(err_msg)

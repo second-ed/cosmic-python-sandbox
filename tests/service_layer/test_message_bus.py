@@ -12,7 +12,7 @@ from cosmic_python_sandbox.service_layer.message_bus import (
     MessageBus,
 )
 from cosmic_python_sandbox.service_layer.uow import UnitOfWork, UnitOfWorkProtocol
-from cosmic_python_sandbox.usecases import EVENT_HANDLERS, Event
+from cosmic_python_sandbox.usecases import EVENT_HANDLERS, Event, catch_err
 
 
 @attrs.define
@@ -65,6 +65,7 @@ def handle_event2_priority(event: Event, uow: UnitOfWorkProtocol) -> list[Event]
     return [SomeEvent3(), SomeEvent4(priority_event=True)]
 
 
+@catch_err
 def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol) -> Event:
     with uow:
         uow.logger.info({"guid": uow.guid, "event": event})
@@ -128,7 +129,7 @@ def handle_event3_priority(event: Event, uow: UnitOfWorkProtocol) -> Event:
                 "INFO: {'guid': '123-abc', 'start_time': '20250527_194000', 'msg': 'Initialising UOW'}",
                 "ERROR: {'guid': '123-abc', 'end_time': '20250527_194000', 'msg': ValueError('Must use a specialised event. Given Event(priority_event=False)')}",
             ],
-            pytest.raises(ValueError),
+            does_not_raise(),
             id="Ensure single queue is executed correctly",
         ),
         pytest.param(
