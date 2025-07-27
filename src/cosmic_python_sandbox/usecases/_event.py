@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable, Literal, Self, TypeVar
 
 import attrs
+
+T = TypeVar("T")
+U = TypeVar("U")
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -34,6 +37,15 @@ class Ok:
         ),
     )
 
+    def is_ok(self) -> Literal[True]:
+        return True
+
+    def is_err(self) -> Literal[False]:
+        return False
+
+    def map(self, func: Callable[[T], U]) -> Ok[U]:
+        return Ok(func(self.inner))
+
 
 @attrs.define
 class Err:
@@ -62,6 +74,15 @@ class Err:
             )
             tb = tb.tb_next
         return trace_info
+
+    def is_ok(self) -> Literal[False]:
+        return False
+
+    def is_err(self) -> Literal[True]:
+        return True
+
+    def map(self, _: Callable[[T], U]) -> Self:
+        return self
 
 
 Result = Ok | Err
