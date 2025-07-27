@@ -9,7 +9,6 @@ T = TypeVar("T")
 U = TypeVar("U")
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
     from types import TracebackType
 
     from cosmic_python_sandbox.service_layer.uow import UnitOfWorkProtocol
@@ -27,14 +26,8 @@ class Event:
 
 @attrs.define
 class Ok:
-    inner: Event | Sequence[Event] | None = attrs.field(
+    inner = attrs.field(
         default=None,
-        validator=attrs.validators.optional(
-            attrs.validators.or_(
-                attrs.validators.instance_of(Event),
-                attrs.validators.deep_iterable(attrs.validators.instance_of(Event)),
-            ),
-        ),
     )
 
     def is_ok(self) -> Literal[True]:
@@ -46,10 +39,16 @@ class Ok:
     def map(self, func: Callable[[T], U]) -> Ok[U]:
         return Ok(func(self.inner))
 
+    def flatten(self) -> Ok[U]:
+        inner = self.inner
+        while isinstance(inner, Ok):
+            inner = inner.inner
+        return Ok(inner)
+
 
 @attrs.define
 class Err:
-    event: Event = attrs.field(validator=attrs.validators.instance_of(Event))
+    inner = attrs.field()
     error: Exception = attrs.field(validator=attrs.validators.instance_of(Exception))
     err_type: BaseException = attrs.field(init=False)
     err_msg: str = attrs.field(init=False)
@@ -82,6 +81,9 @@ class Err:
         return True
 
     def map(self, _: Callable[[T], U]) -> Self:
+        return self
+
+    def flatten(self) -> Self:
         return self
 
 
